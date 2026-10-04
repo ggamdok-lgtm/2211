@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1.0,
+               maximum-scale=1.0,
+               user-scalable=no">
+
+<title>CASE FILE 001 : 23시의 침묵</title>
+
+<style>
+
+/* =====================================================
+   기본 설정
+===================================================== */
+
+@import url(
+    'https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;600;700&display=swap'
+);
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+
+    margin: 0;
+    padding: 0;
+
+    overflow: hidden;
+}
+
+body {
+    font-family: 'Noto Serif KR', serif;
+
+    background: #050505;
+
+    color: #111;
+}
+
+
+/* =====================================================
+   전체 화면
+===================================================== */
+
+#app {
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at center,
+            #292929 0%,
+            #151515 45%,
+            #050505 100%
+        );
+}
+
+
+/* 필름 질감 */
+
+#app::after {
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    pointer-events: none;
+
+    z-index: 999;
+
+    opacity: 0.08;
+
+    background-image:
+        repeating-linear-gradient(
+            0deg,
+            rgba(255,255,255,0.04) 0px,
+            rgba(255,255,255,0.04) 1px,
+            transparent 1px,
+            transparent 4px
+        );
+}
+
+
+/* =====================================================
+   시작 문구
+===================================================== */
+
+.start-message {
+    position: absolute;
+
+    left: 50%;
+    top: 10%;
+
+    transform: translateX(-50%);
+
+    color: rgba(255,255,255,0.7);
+
+    font-size: 13px;
+
+    letter-spacing: 3px;
+
+    white-space: nowrap;
+
+    z-index: 100;
+
+    transition:
+        opacity 0.7s ease;
+}
+
+.start-message.hide {
+    opacity: 0;
+}
+
+
+/* =====================================================
+   봉투 화면
+===================================================== */
+
+.envelope-scene {
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    z-index: 10;
+
+    transition:
+        opacity 1s ease,
+        transform 1s ease;
+}
+
+
+/*
+   봉투가 사라지는 애니메이션
+*/
+
+.envelope-scene.hide {
+    opacity: 0;
+
+    transform:
+        scale(0.7)
+        translateY(20px)
+        rotate(-4deg);
+
+    pointer-events: none;
+}
+
+
+/* =====================================================
+   봉투
+===================================================== */
+
+.envelope {
+    position: relative;
+
+    width: min(78vw, 430px);
+
+    aspect-ratio: 1.55;
+
+    cursor: pointer;
+
+    filter:
+        drop-shadow(
+            0 25px 35px rgba(0,0,0,0.7)
+        );
+
+    transform-style: preserve-3d;
+
+    transition:
+        transform 0.8s ease;
+}
+
+
+/* =====================================================
+   봉투 본체
+===================================================== */
+
+.envelope-body {
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        linear-gradient(
+            145deg,
+            #e0d3ba,
+            #bcae94
+        );
+
+    border-radius: 4px;
+
+    z-index: 1;
+
+    box-shadow:
+        inset 0 0 0 1px
+        rgba(0,0,0,0.12);
+}
+
+
+/* =====================================================
+   봉투 왼쪽 접힘
+===================================================== */
+
+.envelope-left {
+    position: absolute;
+
+    left: 0;
+    bottom: 0;
+
+    width: 0;
+    height: 0;
+
+    border-top:
+        min(27vw,145px)
+        solid transparent;
+
+    border-left:
+        min(39vw,215px)
+        solid #b9aa90;
+
+    z-index: 3;
+}
+
+
+/* =====================================================
+   봉투 오른쪽 접힘
+===================================================== */
+
+.envelope-right {
+    position: absolute;
+
+    right: 0;
+    bottom: 0;
+
+    width: 0;
+    height: 0;
+
+    border-top:
+        min(27vw,145px)
+        solid transparent;
+
+    border-right:
+        min(39vw,215px)
+        solid #b4a58b;
+
+    z-index: 3;
+}
+
+
+/* =====================================================
+   봉투 아래 접힘
+===================================================== */
+
+.envelope-bottom {
+    position: absolute;
+
+    left: 0;
+    bottom: 0;
+
+    width: 0;
+    height: 0;
+
+    border-left:
+        min(39vw,215px)
+        solid transparent;
+
+    border-right:
+        min(39vw,215px)
+        solid transparent;
+
+    border-bottom:
+        min(28vw,150px)
+        solid #d0c0a4;
+
+    z-index: 4;
+}
+
+
+/* =====================================================
+   봉투 뚜껑
+===================================================== */
+
+.envelope-flap {
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    width: 0;
+    height: 0;
+
+    border-left:
+        min(39vw,215px)
+        solid transparent;
+
+    border-right:
+        min(39vw,215px)
+        solid transparent;
+
+    border-top:
+        min(28vw,150px)
+        solid #dfd1b7;
+
+    transform-origin:
+        top center;
+
+    z-index: 5;
+
+    transition:
+        transform 0.9s
+        cubic-bezier(.4,0,.2,1);
+}
+
+
+/* =====================================================
+   봉투 클릭
+===================================================== */
+
+.envelope.open {
+
+    transform:
+        translateY(8px)
+        scale(0.96);
+}
+
+
+/* 뚜껑 열기 */
+
+.envelope.open .envelope-flap {
+
+    transform:
+        rotateX(180deg);
+}
+
+
+/* =====================================================
+   편지 화면
+===================================================== */
+
+/*
+   ★ 중요
+
+   처음에는 편지 화면 자체가
+   완전히 숨겨져 있음.
+*/
+
+.letter-scene {
+
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    padding:
+        4vh 0;
+
+    z-index: 50;
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transform:
+        scale(0.75)
+        translateY(40px);
+
+    pointer-events: none;
+
+    transition:
+        opacity 1.2s ease,
+        transform 1.2s
+        cubic-bezier(.2,.7,.2,1);
+}
+
+
+/*
+   봉투가 사라진 후
+   편지 등장
+*/
+
+.letter-scene.show {
+
+    opacity: 1;
+
+    visibility: visible;
+
+    transform:
+        scale(1)
+        translateY(0);
+
+    pointer-events: auto;
+}
+
+
+/* =====================================================
+   편지지
+===================================================== */
+
+.letter-paper {
+
+    position: relative;
+
+    width:
+        min(88vw,720px);
+
+    height:
+        min(86vh,850px);
+
+    padding:
+        35px 30px;
+
+    background:
+
+        linear-gradient(
+            90deg,
+            rgba(0,0,0,0.035),
+            transparent 12%,
+            transparent 88%,
+            rgba(0,0,0,0.035)
+        ),
+
+        #f1e8d5;
+
+    color: #29251f;
+
+    box-shadow:
+        0 20px 60px
+        rgba(0,0,0,0.55);
+
+    overflow: hidden;
+}
+
+
+/*
+   종이의 미세한 가장자리
+*/
+
+.letter-paper::before {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    pointer-events: none;
+
+    box-shadow:
+        inset 0 0 35px
+        rgba(80,60,30,0.08);
+}
+
+
+/* =====================================================
+   편지 내용
+===================================================== */
+
+.letter-content {
+
+    position: relative;
+
+    width: 100%;
+
+    height: 100%;
+
+    overflow-y: auto;
+
+    scrollbar-width: none;
+
+    padding-bottom: 40px;
+
+    z-index: 2;
+}
+
+.letter-content::-webkit-scrollbar {
+    display: none;
+}
+
+
+/* =====================================================
+   편지 제목
+===================================================== */
+
+.letter h1 {
+
+    margin:
+        0 0 25px;
+
+    font-size:
+        clamp(
+            18px,
+            4vw,
+            28px
+        );
+
+    line-height: 1.6;
+
+    font-weight: 700;
+}
+
+
+/* =====================================================
+   편지 본문
+===================================================== */
+
+.letter p {
+
+    margin:
+        10px 0;
+
+    font-size:
+        14px;
+
+    line-height:
+        2;
+}
+
+
+/* =====================================================
+   인트로
+===================================================== */
+
+.letter .intro {
+
+    font-size:
+        15px;
+
+    margin-bottom:
+        20px;
+}
+
+
+/* =====================================================
+   강조 문장
+===================================================== */
+
+.quote {
+
+    margin:
+        20px 0;
+
+    padding:
+        15px 18px;
+
+    border-left:
+        3px solid #49443b;
+
+    background:
+        rgba(0,0,0,0.045);
+
+    font-size:
+        14px;
+
+    line-height:
+        1.9;
+}
+
+
+/* =====================================================
+   소제목
+===================================================== */
+
+.letter h2 {
+
+    margin-top:
+        30px;
+
+    margin-bottom:
+        15px;
+
+    font-size:
+        18px;
+}
+
+
+/* =====================================================
+   게임 정보
+===================================================== */
+
+.game-info {
+
+    margin:
+        15px 0 25px;
+
+    padding:
+        15px 0;
+
+    border-top:
+        1px solid #bdb4a4;
+
+    border-bottom:
+        1px solid #bdb4a4;
+}
+
+
+.game-info div {
+
+    margin:
+        9px 0;
+
+    font-size:
+        14px;
+
+    line-height:
+        1.7;
+}
+
+
+/* =====================================================
+   서명
+===================================================== */
+
+.signature {
+
+    margin-top:
+        40px !important;
+
+    text-align:
+        right;
+
+    font-weight:
+        600;
+}
+
+
+/* =====================================================
+   PS
+===================================================== */
+
+.ps {
+
+    margin-top:
+        30px !important;
+
+    color:
+        #666;
+
+    font-size:
+        13px !important;
+}
+
+
+/* =====================================================
+   다음 장면 안내
+===================================================== */
+
+.read-complete {
+
+    position: absolute;
+
+    left: 50%;
+
+    bottom: 3%;
+
+    transform:
+        translateX(-50%);
+
+    color:
+        rgba(255,255,255,0.75);
+
+    font-size:
+        12px;
+
+    letter-spacing:
+        2px;
+
+    white-space:
+        nowrap;
+
+    z-index:
+        200;
+
+    opacity:
+        0;
+
+    pointer-events:
+        none;
+
+    transition:
+        opacity 0.8s ease;
+}
+
+.read-complete.show {
+
+    opacity:
+        1;
+}
+
+
+/* =====================================================
+   빛 효과
+===================================================== */
+
+.light-effect {
+
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        white;
+
+    opacity:
+        0;
+
+    z-index:
+        500;
+
+    pointer-events:
+        none;
+}
+
+
+.light-effect.flash {
+
+    animation:
+        lightFlash
+        2.8s
+        ease
+        forwards;
+}
+
+
+@keyframes lightFlash {
+
+    0% {
+        opacity: 0;
+    }
+
+    15% {
+        opacity: 0.15;
+    }
+
+    30% {
+        opacity: 1;
+    }
+
+    55% {
+        opacity: 0.92;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+
+/* =====================================================
+   마지막 화면
+===================================================== */
+
+.final-scene {
+
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    background:
+        white;
+
+    z-index:
+        600;
+
+    opacity:
+        0;
+
+    visibility:
+        hidden;
+
+    pointer-events:
+        none;
+
+    transition:
+        opacity 1s ease;
+}
+
+
+.final-scene.show {
+
+    opacity:
+        1;
+
+    visibility:
+        visible;
+}
+
+
+/* 마지막 문장 */
+
+.final-text {
+
+    width:
+        90%;
+
+    text-align:
+        center;
+
+    color:
+        #111;
+
+    font-size:
+        clamp(
+            19px,
+            4.5vw,
+            32px
+        );
+
+    letter-spacing:
+        2px;
+
+    line-height:
+        2;
+
+    opacity:
+        0;
+
+    transform:
+        translateY(20px);
+
+    transition:
+        opacity 2s ease,
+        transform 2s ease;
+}
+
+
+.final-scene.show
+.final-text {
+
+    opacity:
+        1;
+
+    transform:
+        translateY(0);
+}
+
+
+/* =====================================================
+   모바일
+===================================================== */
+
+@media (max-width: 600px) {
+
+    .envelope {
+
+        width:
+            82vw;
+    }
+
+
+    .letter-paper {
+
+        width:
+            92vw;
+
+        height:
+            86vh;
+
+        padding:
+            26px 21px;
+    }
+
+
+    .letter h1 {
+
+        font-size:
+            18px;
+    }
+
+
+    .letter p {
+
+        font-size:
+            14px;
+
+        line-height:
+            1.9;
+    }
+
+
+    .quote {
+
+        font-size:
+            13px;
+
+        padding:
+            14px 15px;
+    }
+
+}
+
+
+/* =====================================================
+   세로가 짧은 기기
+===================================================== */
+
+@media (max-height: 650px) {
+
+    .letter-paper {
+
+        height:
+            90vh;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div id="app">
+
+
+    <!-- =================================================
+         첫 화면
+         봉투만 존재
+    ================================================== -->
+
+    <div
+        class="start-message"
+        id="startMessage"
+    >
+        편지를 눌러보세요
+    </div>
+
+
+    <div
+        class="envelope-scene"
+        id="envelopeScene"
+    >
+
+        <div
+            class="envelope"
+            id="envelope"
+        >
+
+            <!-- 봉투 본체 -->
+
+            <div
+                class="envelope-body"
+            ></div>
+
+
+            <!-- 봉투 접힘 -->
+
+            <div
+                class="envelope-left"
+            ></div>
+
+            <div
+                class="envelope-right"
+            ></div>
+
+            <div
+                class="envelope-bottom"
+            ></div>
+
+
+            <!-- 봉투 뚜껑 -->
+
+            <div
+                class="envelope-flap"
+            ></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         두 번째 화면
+         봉투가 사라진 뒤 편지 등장
+    ================================================== -->
+
+    <div
+        class="letter-scene"
+        id="letterScene"
+    >
+
+        <div
+            class="letter-paper"
+        >
+
+            <div
+                class="letter-content"
+            >
+
+
+                <!-- 제목 -->
+
+                <h1>
+
+                    🕵️ 221B G감독 주최 추리 게임<br>
+
+                    CASE FILE 001 : 23시의 침묵
+
+                </h1>
+
+
+                <!-- 인트로 -->
+
+                <p class="intro">
+
+                    여러분들에게 도착한 한 통의 편지.<br>
+
+                    그 편지를 읽어보자.
+
+                </p>
+
+
+                <!-- 편지 소개 -->
+
+                <div
+                    class="quote"
+                >
+
+                    221B 탐정사무소 G감독이
+                    보낸 편지입니다.
+
+                </div>
+
+
+                <!-- 의뢰 -->
+
+                <div
+                    class="quote"
+                >
+
+                    [221B 탐정사무소에서 여러분들에게
+                    한가지 의뢰를 드릴려고 연락드렸습니다]
+
+                </div>
+
+
+                <!-- 사건 설명 -->
+
+                <p>
+
+                    한 아파트에서 발생한 의문의 사건.
+
+                    현장에 남겨진 기록, CCTV,
+
+                    목격자의 진술,
+
+                    그리고 서로 맞지 않는 시간들.
+
+                </p>
+
+
+                <p>
+
+                    여러분은 한 팀의 탐정들이 되어
+
+                    사건 자료를 조사하고,
+
+                    흩어진 단서들을 연결해
+
+                    사건의 진실을 밝혀내야 합니다.
+
+                </p>
+
+
+                <p>
+
+                    과연 여러분들은 사건의 진상을 찾아내며
+
+                    범인을 찾을 수 있을까요?
+
+                </p>
+
+
+                <p>
+
+                    그럼 여러분들만 믿고
+
+                    사건을 의뢰하겠습니다.
+
+                </p>
+
+
+                <!-- 게임 정보 -->
+
+                <h2>
+
+                    🔎 게임 정보
+
+                </h2>
+
+
+                <div
+                    class="game-info"
+                >
+
+                    <div>
+
+                        <strong>
+                            장르:
+                        </strong>
+
+                        협동형 현장 조사 추리
+
+                    </div>
+
+
+                    <div>
+
+                        <strong>
+                            인원:
+                        </strong>
+
+                        4~6명
+
+                    </div>
+
+
+                    <div>
+
+                        <strong>
+                            예상 시간:
+                        </strong>
+
+                        70~90분
+
+                    </div>
+
+
+                    <div>
+
+                        <strong>
+                            진행 방식:
+                        </strong>
+
+                        현장 조사 · 증거 분석 · 팀 추리
+
+                    </div>
+
+                </div>
+
+
+                <!-- 추가 설명 -->
+
+                <p>
+
+                    범인을 연기하거나
+
+                    복잡한 개인 역할을
+
+                    수행할 필요는 없습니다.
+
+                </p>
+
+
+                <p>
+
+                    중요한 건 관찰하고,
+
+                    의심하고,
+
+                    서로의 추리를 연결하는 것입니다.
+
+                </p>
+
+
+                <p>
+
+                    과연 여러분은 현장 속에 숨겨진 진실을
+
+                    밝혀낼 수 있을까요?
+
+                </p>
+
+
+                <!-- 사건 파일 -->
+
+                <h2>
+
+                    CASE FILE 001 — 23시의 침묵
+
+                </h2>
+
+
+                <!-- 서명 -->
+
+                <p
+                    class="signature"
+                >
+
+                    추신<br>
+
+                    221B 미스터리 탐정사무소<br>
+
+                    G감독
+
+                </p>
+
+
+                <!-- PS -->
+
+                <p
+                    class="ps"
+                >
+
+                    PS. 편지를 자세히 보시길 바랍니다.<br>
+
+                    미래에서 온 편지 같은데....
+
+                </p>
+
+
+                <div
+                    style="height:60px"
+                ></div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         읽기 완료
+    ================================================== -->
+
+    <div
+        class="read-complete"
+        id="readComplete"
+    >
+
+        화면을 터치하면 다음 장면으로 이동합니다
+
+    </div>
+
+
+    <!-- =================================================
+         빛
+    ================================================== -->
+
+    <div
+        class="light-effect"
+        id="lightEffect"
+    ></div>
+
+
+    <!-- =================================================
+         마지막 장면
+    ================================================== -->
+
+    <div
+        class="final-scene"
+        id="finalScene"
+    >
+
+        <div
+            class="final-text"
+        >
+
+            알 수 없는 빛이<br>
+
+            눈 앞을 가리기 시작했다.
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   요소 가져오기
+===================================================== */
+
+const envelope =
+    document.getElementById(
+        "envelope"
+    );
+
+const envelopeScene =
+    document.getElementById(
+        "envelopeScene"
+    );
+
+const letterScene =
+    document.getElementById(
+        "letterScene"
+    );
+
+const startMessage =
+    document.getElementById(
+        "startMessage"
+    );
+
+const readComplete =
+    document.getElementById(
+        "readComplete"
+    );
+
+const lightEffect =
+    document.getElementById(
+        "lightEffect"
+    );
+
+const finalScene =
+    document.getElementById(
+        "finalScene"
+    );
+
+
+/* =====================================================
+   상태
+===================================================== */
+
+let opened = false;
+
+let finished = false;
+
+
+/* =====================================================
+   봉투 클릭
+===================================================== */
+
+envelope.addEventListener(
+    "click",
+    function(event) {
+
+        event.stopPropagation();
+
+
+        /*
+           이미 클릭했다면
+           중복 실행하지 않음
+        */
+
+        if (opened) {
+
+            return;
+        }
+
+
+        opened = true;
+
+
+        /*
+           "편지를 눌러보세요"
+           제거
+        */
+
+        startMessage.classList.add(
+            "hide"
+        );
+
+
+        /*
+           봉투 열기
+        */
+
+        envelope.classList.add(
+            "open"
+        );
+
+
+        /*
+           0.7초 후
+           봉투 자체가 사라지기 시작
+        */
+
+        setTimeout(
+            function() {
+
+                envelopeScene.classList.add(
+                    "hide"
+                );
+
+            },
+            700
+        );
+
+
+        /*
+           봉투가 사라진 다음
+           편지 등장
+        */
+
+        setTimeout(
+            function() {
+
+                letterScene.classList.add(
+                    "show"
+                );
+
+            },
+            1200
+        );
+
+
+        /*
+           편지 등장 애니메이션이
+           끝난 후 안내 표시
+        */
+
+        setTimeout(
+            function() {
+
+                readComplete.classList.add(
+                    "show"
+                );
+
+            },
+            2500
+        );
+
+    }
+);
+
+
+/* =====================================================
+   화면 클릭
+===================================================== */
+
+document
+.getElementById("app")
+.addEventListener(
+    "click",
+    function(event) {
+
+
+        /*
+           아직 봉투를 열지 않았다면
+           아무것도 하지 않음
+        */
+
+        if (!opened) {
+
+            return;
+        }
+
+
+        /*
+           이미 마지막 장면이면
+           아무것도 하지 않음
+        */
+
+        if (finished) {
+
+            return;
+        }
+
+
+        /*
+           편지지 내부를 누른 경우
+
+           스크롤이나 읽기를 위해
+           다음 장면으로 넘어가지 않음
+        */
+
+        if (
+            event.target.closest(
+                ".letter-paper"
+            )
+        ) {
+
+            return;
+        }
+
+
+        /*
+           편지 바깥을 누르면
+           마지막 장면으로 이동
+        */
+
+        finishScene();
+
+    }
+);
+
+
+/* =====================================================
+   마지막 장면
+===================================================== */
+
+function finishScene() {
+
+
+    if (finished) {
+
+        return;
+    }
+
+
+    finished = true;
+
+
+    /*
+       안내 문구 제거
+    */
+
+    readComplete.classList.remove(
+        "show"
+    );
+
+
+    /*
+       편지 화면을
+       서서히 사라지게 함
+    */
+
+    letterScene.classList.remove(
+        "show"
+    );
+
+
+    /*
+       잠시 후 빛
+    */
+
+    setTimeout(
+        function() {
+
+            lightEffect.classList.add(
+                "flash"
+            );
+
+        },
+        400
+    );
+
+
+    /*
+       빛이 화면을 가린 후
+       마지막 문장 표시
+    */
+
+    setTimeout(
+        function() {
+
+            finalScene.classList.add(
+                "show"
+            );
+
+        },
+        1300
+    );
+
+}
+
+</script>
+
+</body>
+</html>
